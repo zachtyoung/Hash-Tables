@@ -1,6 +1,7 @@
 # '''
 # Linked List hash table key/value pair
 # '''
+# used for collisions
 class LinkedPair:
     def __init__(self, key, value):
         self.key = key
@@ -51,7 +52,11 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        #hash the key
+        index = self._hash_mod(key)
+        if self.storage[index] is not None:
+            print("Danger will robinson")
+        self.storage[index] = LinkedPair(key, value)
 
 
 
@@ -63,7 +68,11 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+        if self.storage[index] == None:
+            print("Key not found")
+            return
+        self.storage[index] = None
 
 
     def retrieve(self, key):
@@ -74,7 +83,15 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+        if self.storage[index] is not None:
+            if self.storage[index].key == key:
+                return self.storage[index].value
+            else:
+                print("error")
+                return None
+        else:
+            return None
 
 
     def resize(self):
@@ -84,7 +101,15 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        self.capacity *= 2
+        new_storage = [None] * self.capacity
+
+        for i in self.storage:
+            if i is not None:
+                new_index = self._hash_mod(i.key)
+                new_storage[new_index] = LinkedPair(i.key, i.value)
+        
+        self.storage = new_storage
 
 
 
