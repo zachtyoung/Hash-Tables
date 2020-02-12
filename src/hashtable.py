@@ -149,15 +149,23 @@ class HashTable:
 
         Fill this in.
         '''
-        self.capacity *= 2
-        new_storage = [None] * self.capacity
+        old_map = self.storage
+        self.capacity = self.capacity * 2
+        self.storage = [None] * self.capacity
 
-        for i in self.storage:
-            if i is not None:
-                new_index = self._hash_mod(i.key)
-                new_storage[new_index] = LinkedPair(i.key, i.value)
-        
-        self.storage = new_storage
+        for contents in old_map:
+            if contents is None:
+                continue
+            elif contents.next is None:
+                self.insert(contents.key, contents.value)
+            else:
+                node = contents
+                while True:
+                    self.insert(node.key, node.value)
+                    if node.next is None:
+                        break
+                    else:
+                        node = node.next
 
 
 
