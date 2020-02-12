@@ -43,6 +43,14 @@ class HashTable:
         '''
         return self._hash(key) % self.capacity
 
+    def get_node(self, key):
+        node = self.storage[self._hash_mod(key)]
+        while True:
+            if node.key == key:
+                return node
+            else:
+                node = node.next
+
 
     def insert(self, key, value):
         '''
@@ -54,9 +62,25 @@ class HashTable:
         '''
         #hash the key
         index = self._hash_mod(key)
-        if self.storage[index] is not None:
-            print("Danger will robinson")
-        self.storage[index] = LinkedPair(key, value)
+        
+        # There is nothing in storage at the key's index
+        if self.storage[self._hash_mod(key)] is None:
+            self.storage[self._hash_mod(key)] = LinkedPair(key, value)
+
+        # Key already exists, overwrite the value
+        elif self.retrieve(key) is not None:
+            node = self.get_node(key)
+            node.value = value
+
+        # Key does not exist, append it
+        elif self.retrieve(key) is None:
+            node = self.storage[self._hash_mod(key)]
+            while True:
+                if node.next is None:
+                    node.next = LinkedPair(key, value)
+                    return
+                else:
+                    node = node.next
 
 
 
@@ -69,10 +93,31 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
-        if self.storage[index] == None:
-            print("Key not found")
-            return
-        self.storage[index] = None
+        # There is no matching node, return None
+        if self.get_node(key) is None:
+            return None
+
+
+        # Single node at the node's  location
+        elif self.storage[index].next is None:
+            self.storage[index] = None
+
+
+        else:
+            prev = None
+            node = self.storage[index]
+            while True:
+                # prev = node
+                if node.key == key:
+                    if node.next is None:
+                        prev.next = None
+                    else:
+                        prev.next = node.next
+                    prev.next = node.next
+                    break
+                else:
+                    prev = node
+                    node = node.next 
 
 
     def retrieve(self, key):
@@ -83,15 +128,18 @@ class HashTable:
 
         Fill this in.
         '''
-        index = self._hash_mod(key)
-        if self.storage[index] is not None:
-            if self.storage[index].key == key:
-                return self.storage[index].value
-            else:
-                print("error")
-                return None
-        else:
+        if self.storage[self._hash_mod(key)] is None:
             return None
+        else:
+            node = self.storage[self._hash_mod(key)]
+            while True:
+                if node.key == key:
+                    return node.value
+                elif node.next is not None:
+                    node = node.next
+                else:
+                    return None
+
 
 
     def resize(self):
